@@ -20,6 +20,7 @@ public class LogAnalyzer
         // Create the array object to hold the hourly
         // access counts.
         hourCounts = new int[24];
+        
         // Create the reader to obtain the data.
         reader = new LogfileReader();
     }
