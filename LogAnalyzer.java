@@ -76,6 +76,18 @@ public class LogAnalyzer
             dayCounts[day]++;
         }
     }
+    
+    /**
+     *  Analyze the monthly access data from the log file.
+     */
+    public void analyzeMonthlyData()
+    {
+        while(reader.hasNext()) {
+            LogEntry entry = reader.next();
+            int month = entry.getMonth();
+            monthCounts[month]++;
+        }
+    }
 
     /**
      * Print the hourly counts.
@@ -100,6 +112,18 @@ public class LogAnalyzer
         System.out.println("Day : Count");
         for(int day=1; day < dayCounts.length; day++) {
             System.out.println(day + ": " + dayCounts[day]);
+        }
+    }
+    
+    /**
+     *  Print the monthly counts.
+     */
+    public void printMonthlyCounts()
+    {
+        analyzeMonthlyData();
+        System.out.println("Month : Count");
+        for(int month=1; month < monthCounts.length; month++) {
+            System.out.println(month + ": " + monthCounts[month]);
         }
     }
     
