@@ -15,10 +15,16 @@ public class LogAnalyzer
     private int[] dayCounts;
     // Where to calculate the monthly access counts.
     private int[] monthCounts;
-    // Where to calculate the yearly access counts.
-    private int[] yearCounts;
+    // Where to calculate average mountly counts.
+    private double[] monthlyAverages;
+    
+    private int year = 0;
+    private int yearCounter = 0;
+    
     // Use a LogfileReader to access the data.
     private LogfileReader reader;
+    
+    private String filename;
 
     /**
      * Create an object to analyze hourly web accesses.
@@ -30,10 +36,12 @@ public class LogAnalyzer
         hourCounts = new int[24];
         dayCounts = new int[32];
         monthCounts = new int[13];
-        yearCounts = new int[31];
         
+        monthlyAverages = new double[13];
+        
+        this.filename = "";
         // Create the reader to obtain the data.
-        reader = new LogfileReader();
+        //reader = new LogfileReader();
     }
     
      /**
@@ -47,10 +55,10 @@ public class LogAnalyzer
         hourCounts = new int[24];
         dayCounts = new int[32];
         monthCounts = new int[13];
-        yearCounts = new int[31];
         
-        // Create the reader to obtain the data.
-        reader = new LogfileReader(filename);
+        monthlyAverages = new double[13];
+        
+        this.filename = filename;
     }
 
     /**
@@ -58,6 +66,7 @@ public class LogAnalyzer
      */
     public void analyzeHourlyData()
     {
+        reader = new LogfileReader(filename);
         while(reader.hasNext()) {
             LogEntry entry = reader.next();
             int hour = entry.getHour();
@@ -70,6 +79,7 @@ public class LogAnalyzer
      */
     public void analyzeDailyData()
     {
+        reader = new LogfileReader(filename);
         while(reader.hasNext()) {
             LogEntry entry = reader.next();
             int day = entry.getDay();
@@ -86,6 +96,26 @@ public class LogAnalyzer
             LogEntry entry = reader.next();
             int month = entry.getMonth();
             monthCounts[month]++;
+        }
+    }
+    
+    /**
+     *  Calculate the average number of accesses per month.
+     */
+    public void averageAccessesPerMonth()
+    {
+        while(reader.hasNext()) {
+            LogEntry entry = reader.next();
+            if(year != entry.getYear()) {
+                yearCounter++;
+                year = entry.getYear();
+            }
+            int month = entry.getMonth();
+            monthCounts[month]++;
+        }
+        
+        for(int i=1; i < monthlyAverages.length; i++) {
+            monthlyAverages[i] = monthCounts[i] / yearCounter;
         }
     }
 
@@ -117,13 +147,27 @@ public class LogAnalyzer
     
     /**
      *  Print the monthly counts.
+     *  These should have been set with a prior
+     *  call to analyzeMontlyData.
      */
     public void printMonthlyCounts()
     {
-        analyzeMonthlyData();
         System.out.println("Month : Count");
         for(int month=1; month < monthCounts.length; month++) {
             System.out.println(month + ": " + monthCounts[month]);
+        }
+    }
+    
+    /**
+     *  Print the average monthly counts.
+     *  These should have been set with a prior
+     *  call to averageAccessesPerMonth.
+     */
+    public void printMontlyAverage()
+    {
+        System.out.println("Month : Avg. Count");
+        for(int month=1; month < monthlyAverages.length; month++) {
+            System.out.println(month + ": " + monthlyAverages[month]);
         }
     }
     
@@ -237,5 +281,38 @@ public class LogAnalyzer
             }
         }
         return day;
+    }
+    
+    /**
+     *  Return the least busy month in the log file.
+     */
+    public int quietestMonth() 
+    {
+        int lowest = monthCounts[1];
+        int month = 0;
+        analyzeMonthlyData();
+        for(int i=1; i < monthCounts.length; i++) {
+            if(monthCounts[i] < lowest) {
+                lowest = monthCounts[i];
+                month = i;
+            }
+        }
+        return month;
+    }
+    
+    /**
+     *  Return the busiest month in the log file.
+     */
+    public int busiestMonth() {
+        int highest = monthCounts[1];
+        int month = 0;
+        analyzeMonthlyData();
+        for(int i=1; i < monthCounts.length; i++) {
+            if(monthCounts[i] > highest) {
+                highest = monthCounts[i];
+                month = i;
+            }
+        }
+        return month;
     }
 }
