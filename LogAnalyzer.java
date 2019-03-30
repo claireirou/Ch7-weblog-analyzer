@@ -100,6 +100,28 @@ public class LogAnalyzer
     }
     
     /**
+     *  Return the busiest two-hour period in the log file.
+     *  
+     * @return the first hour of the two-hour period
+     */
+    public int busiestTwoHour()
+    {
+       int highest = hourCounts[0];
+       int hour = 0;
+       for(int i=0; i<hourCounts.length - 1; i++) {
+           if((hourCounts[i] + hourCounts[i+1]) > highest) {
+               highest = hourCounts[i] + hourCounts[i+1];
+               hour = i;
+            }
+        }
+       if(hourCounts[23] + hourCounts[0] > highest) {
+           highest = hourCounts[23] + hourCounts[0];
+           hour = 23;
+        }
+       return hour; 
+    }
+    
+    /**
      *  Return the least busy hour in the log file.
      */
     public int quietestHour()
