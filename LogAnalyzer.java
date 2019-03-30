@@ -28,9 +28,9 @@ public class LogAnalyzer
     { 
         // Create the array objects to hold the access counts.
         hourCounts = new int[24];
-        dayCounts = new int[31];
-        monthCounts = new int[12];
-        yearCounts = new int[30];
+        dayCounts = new int[32];
+        monthCounts = new int[13];
+        yearCounts = new int[31];
         
         // Create the reader to obtain the data.
         reader = new LogfileReader();
@@ -45,9 +45,9 @@ public class LogAnalyzer
     { 
         // Create the array objects to hold the access counts.
         hourCounts = new int[24];
-        dayCounts = new int[31];
-        monthCounts = new int[12];
-        yearCounts = new int[30];
+        dayCounts = new int[32];
+        monthCounts = new int[13];
+        yearCounts = new int[31];
         
         // Create the reader to obtain the data.
         reader = new LogfileReader(filename);
@@ -64,6 +64,18 @@ public class LogAnalyzer
             hourCounts[hour]++;
         }
     }
+    
+    /**
+     *  Analyze the daily access data from the log file.
+     */
+    public void analyzeDailyData()
+    {
+        while(reader.hasNext()) {
+            LogEntry entry = reader.next();
+            int day = entry.getDay();
+            dayCounts[day]++;
+        }
+    }
 
     /**
      * Print the hourly counts.
@@ -75,6 +87,19 @@ public class LogAnalyzer
         System.out.println("Hr: Count");
         for(int hour = 0; hour < hourCounts.length; hour++) {
             System.out.println(hour + ": " + hourCounts[hour]);
+        }
+    }
+    
+    /**
+     *  Print the daily counts.
+     *  These should have been set with a prior
+     *  call to analyzeDailyData.
+     */
+    public void printDailyCounts()
+    {
+        System.out.println("Day : Count");
+        for(int day=1; day < dayCounts.length; day++) {
+            System.out.println(day + ": " + dayCounts[day]);
         }
     }
     
@@ -154,5 +179,39 @@ public class LogAnalyzer
             }
         }
         return hour;   
+    }
+    
+    /**
+     *  Return the least busy day in the log file.
+     */
+    public int quietestDay()
+    {
+        int lowest = dayCounts[1];
+        int day = 0;
+        analyzeDailyData();
+        for(int i=1; i<dayCounts.length; i++) {
+            if(dayCounts[i] < lowest) {
+                lowest = dayCounts[i];
+                day = i;
+            }
+        }
+        return day;
+    }
+    
+    /**
+     *  Return the busiest day in the log file.
+     */
+    public int busiestDay()
+    {
+        int highest = dayCounts[1];
+        int day = 0;
+        analyzeDailyData();
+        for(int i=1; i<dayCounts.length; i++) {
+            if(dayCounts[i] > highest) {
+                highest = dayCounts[i];
+                day = i;
+            }
+        }
+        return day;
     }
 }
