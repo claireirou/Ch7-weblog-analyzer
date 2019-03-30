@@ -76,10 +76,42 @@ public class LogAnalyzer
      */
     public int numberOfAccesses()
     {
-        int total =0;
+        int total = 0;
         for(int i=0; i<hourCounts.length; i++) {
             total += hourCounts[i];
         }
         return total;
+    }
+    
+    /**
+     *  Return the busiest hour in the log file.
+     */
+    public int busiestHour()
+    {
+        int highest = hourCounts[0];
+        int hour =0;
+        for(int i=0; i<hourCounts.length; i++) {
+            if (hourCounts[i] > highest) {
+                highest = hourCounts[i];
+                hour = i;
+            }
+        }
+        return hour; 
+    }
+    
+    /**
+     *  Return the least busy hour in the log file.
+     */
+    public int quietestHour()
+    {
+        int lowest = hourCounts[0];
+        int hour = 0;
+        for(int i=0; i<hourCounts.length; i++) {
+            if(hourCounts[i] < lowest) {
+                lowest = hourCounts[i];
+                hour = i;
+            }
+        }
+        return hour;   
     }
 }
