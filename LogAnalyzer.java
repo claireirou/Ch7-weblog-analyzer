@@ -18,8 +18,7 @@ public class LogAnalyzer
     // Where to calculate average mountly counts.
     private double[] monthlyAverages;
     
-    private int year = 0;
-    private int yearCounter = 0;
+    
     
     // Use a LogfileReader to access the data.
     private LogfileReader reader;
@@ -92,6 +91,7 @@ public class LogAnalyzer
      */
     public void analyzeMonthlyData()
     {
+        reader = new LogfileReader(filename);
         while(reader.hasNext()) {
             LogEntry entry = reader.next();
             int month = entry.getMonth();
@@ -104,8 +104,13 @@ public class LogAnalyzer
      */
     public void averageAccessesPerMonth()
     {
+        reader = new LogfileReader(filename);
+        int year = 0;
+        int yearCounter = 0; //Keeps track of the number of years
+        
         while(reader.hasNext()) {
             LogEntry entry = reader.next();
+            //Check if entry is for a new year
             if(year != entry.getYear()) {
                 yearCounter++;
                 year = entry.getYear();
@@ -115,7 +120,7 @@ public class LogAnalyzer
         }
         
         for(int i=1; i < monthlyAverages.length; i++) {
-            monthlyAverages[i] = monthCounts[i] / yearCounter;
+            monthlyAverages[i] = (monthCounts[i] * 1.0) / yearCounter;
         }
     }
 
