@@ -6,6 +6,9 @@ import java.util.Calendar;
  * Individual fields are made available via
  * accessors such as getHour() and getMinute().
  * 
+ * @author Claire Iroudayassamy
+ * @version    2019.03.30
+ * 
  * @author David J. Barnes and Michael Kölling.
  * @version    2016.02.29
  */

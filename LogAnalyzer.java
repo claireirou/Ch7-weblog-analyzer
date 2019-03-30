@@ -1,6 +1,9 @@
 /**
  * Read web server data and analyse hourly access patterns.
  * 
+ * @author Claire Iroudayassamy
+ * @version    2019.03.30
+ * 
  * @author David J. Barnes and Michael Kölling.
  * @version    2016.02.29
  */
@@ -8,6 +11,12 @@ public class LogAnalyzer
 {
     // Where to calculate the hourly access counts.
     private int[] hourCounts;
+    //Where to calculate the daily access counts.
+    private int[] dayCounts;
+    // Where to calculate the monthly access counts.
+    private int[] monthCounts;
+    // Where to calculate the yearly access counts.
+    private int[] yearCounts;
     // Use a LogfileReader to access the data.
     private LogfileReader reader;
 
@@ -17,9 +26,11 @@ public class LogAnalyzer
      */
     public LogAnalyzer()
     { 
-        // Create the array object to hold the hourly
-        // access counts.
+        // Create the array objects to hold the access counts.
         hourCounts = new int[24];
+        dayCounts = new int[31];
+        monthCounts = new int[12];
+        yearCounts = new int[30];
         
         // Create the reader to obtain the data.
         reader = new LogfileReader();
@@ -32,9 +43,12 @@ public class LogAnalyzer
      */
     public LogAnalyzer(String filename)
     { 
-        // Create the array object to hold the hourly
-        // access counts.
+        // Create the array objects to hold the access counts.
         hourCounts = new int[24];
+        dayCounts = new int[31];
+        monthCounts = new int[12];
+        yearCounts = new int[30];
+        
         // Create the reader to obtain the data.
         reader = new LogfileReader(filename);
     }
@@ -78,6 +92,7 @@ public class LogAnalyzer
     public int numberOfAccesses()
     {
         int total = 0;
+        analyzeHourlyData();
         for(int i=0; i<hourCounts.length; i++) {
             total += hourCounts[i];
         }
@@ -91,6 +106,7 @@ public class LogAnalyzer
     {
         int highest = hourCounts[0];
         int hour =0;
+        analyzeHourlyData();
         for(int i=0; i<hourCounts.length; i++) {
             if (hourCounts[i] > highest) {
                 highest = hourCounts[i];
@@ -109,6 +125,7 @@ public class LogAnalyzer
     {
        int highest = hourCounts[0];
        int hour = 0;
+       analyzeHourlyData();
        for(int i=0; i<hourCounts.length - 1; i++) {
            if((hourCounts[i] + hourCounts[i+1]) > highest) {
                highest = hourCounts[i] + hourCounts[i+1];
@@ -129,6 +146,7 @@ public class LogAnalyzer
     {
         int lowest = hourCounts[0];
         int hour = 0;
+        analyzeHourlyData();
         for(int i=0; i<hourCounts.length; i++) {
             if(hourCounts[i] < lowest) {
                 lowest = hourCounts[i];
