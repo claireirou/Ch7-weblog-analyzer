@@ -1,3 +1,4 @@
+import java.util.HashMap;
 /**
  * The new and improved LogAnalyzer!
  * Read web server data and analyse access patterns...
@@ -17,14 +18,17 @@ public class LogAnalyzerPro
     private int[] monthCounts;
     // Where to calculate average mountly counts.
     private double[] monthlyAverages;
+    // Where to calculate access code counts.
+    private int[] codeCounts;
+    // Where to calculate yearly counts.
+    private HashMap<Integer, Integer> yearCounts;
     
-    //Keeps track of the number of years
-    private int yearCounter = 0;
     // Determines if data has been analyzed.
     private boolean analyzed = false;
     
     // Use a LogfileReader to access the data.
     private LogfileReader reader;
+    private LogfileReader reader2;
 
     /**
      * Create an object to analyze web accesses.
@@ -36,13 +40,17 @@ public class LogAnalyzerPro
         hourCounts = new int[24];
         dayCounts = new int[32];
         monthCounts = new int[13];
+        codeCounts = new int[3];
         monthlyAverages = new double[13];
+        // Create the HashMap object to hold year access counts.
+        yearCounts = new HashMap<Integer, Integer>();
         
         // Create the reader to obtain the data.
         reader = new LogfileReader();
+        reader2 = new LogfileReader();
     }
     
-     /**
+    /**
      * Create an object to analyze web accesses.
      * 
      * @param filename The name of the file to analyze
@@ -54,8 +62,12 @@ public class LogAnalyzerPro
         dayCounts = new int[32];
         monthCounts = new int[13];
         monthlyAverages = new double[13];
+        codeCounts = new int[3];
+        // Create the HashMap objects to hold access counts.
+        yearCounts = new HashMap<Integer, Integer>();
         
         reader = new LogfileReader(filename);
+        reader2 = new LogfileReader(filename);
     }
 
     /**
@@ -64,19 +76,33 @@ public class LogAnalyzerPro
     public void analyzeData()
     {
         if(!analyzed) {
-            int year = 0;
             while(reader.hasNext()) {
                 LogEntry entry = reader.next();
                 int hour = entry.getHour();
                 int day = entry.getDay();
                 int month = entry.getMonth();
+                int year = entry.getYear();
+                int code = entry.getCode();
                 
+                //increase array objects
                 hourCounts[hour]++;
                 dayCounts[day]++;
                 monthCounts[month]++;
-                if(year != entry.getYear()) {
-                    yearCounter++;
-                    year = entry.getYear();
+                //increase HashMap value
+                if(!yearCounts.containsKey(year)) {
+                    yearCounts.put(year,1);
+                } else {
+                    yearCounts.replace(year,yearCounts.get(year) +1);
+                }
+                //increase code array
+                switch(code) {
+                    case 200: codeCounts[0]++;
+                              break;
+                    case 404: codeCounts[1]++;
+                              break;
+                    case 403: codeCounts[2]++;
+                              break;
+                    default: System.out.println("Error! Access code not recognized.");
                 }
             }
             analyzed = true;
@@ -92,7 +118,7 @@ public class LogAnalyzerPro
     {
         if(analyzed) {
             for(int i=1; i < monthlyAverages.length; i++) {
-                monthlyAverages[i] = (monthCounts[i] * 1.0) / yearCounter;
+                monthlyAverages[i] = (monthCounts[i] * 1.0) / yearCounts.size();
             }
         } else {
             System.out.println("Please analyze data first.");
@@ -334,5 +360,66 @@ public class LogAnalyzerPro
             System.out.println("Please analyze data first.");
         }
         return month;
+    }
+    
+    /**
+     *  Print counts of successful, not found, and
+     *  forbidden acceses per month for a given year.
+     *  
+     *  @param year The year of the counts to print
+     */
+    public void accessCodeCount(int year)
+    {
+        LogEntry entry = reader2.next();
+        int month = 1;
+        int yr = entry.getYear();
+        
+        //Access code counters
+        int code200 = 0;
+        int code404 = 0;
+        int code403 = 0;
+        
+        System.out.println("Year: " + year);
+        System.out.println("Month : Code: Access Count");
+        while(reader2.hasNext()) {
+            if(yr != year) { //If entry isn't the year we want, move to next entry.
+                entry = reader2.next();
+                yr = entry.getYear();
+            } else if(month != entry.getMonth()) {
+                /*If entry month doesn't match
+                  Print out current month details
+                  and increase month by 1.
+                  Reset code counters */
+                System.out.println(month + ":  200 OK: \t   " + code200);
+                System.out.println("    404 Not Found: " + code404);
+                System.out.println("    403 Forbidden: " + code403 + "\n");
+                month++;
+                code200 = 0;
+                code404 = 0;
+                code403 = 0;
+            } else if (month == entry.getMonth()) {
+                switch(entry.getCode()) {
+                    case 200: code200++;
+                                break;
+                    case 404: code404++;
+                                break;
+                    case 403: code403++;
+                    default:    break;
+                }
+                //move on to the next item and reset the year
+                entry = reader2.next();
+                yr = entry.getYear();
+            }
+        }
+        //Print the rest of months details if needed.
+        while(month <= 12) {
+            System.out.println(month + ":  200 OK: \t   " + code200);
+            System.out.println("    404 Not Found: " + code404);
+            System.out.println("    403 Forbidden: " + code403 + "\n");
+            month++;
+            code200 = 0;
+            code404 = 0;
+            code403 = 0;
+        }
     }
 }
