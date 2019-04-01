@@ -177,6 +177,21 @@ public class LogAnalyzerPro
     }
     
     /**
+     *  Print the yearly counts.
+     *  These should have been set with a prior
+     *  call to analyzeData.
+     */
+    public void printYearlyCounts()
+    {
+        if(analyzed) {
+            System.out.println("Year=Count");
+            System.out.println(yearCounts.entrySet());
+        } else {
+            System.out.println("Please analyze data first.");
+        }
+    }
+    
+    /**
      *  Print the average monthly counts.
      *  These should have been set with a prior
      *  call to monthlyAverages.
@@ -218,17 +233,20 @@ public class LogAnalyzerPro
     }
     
     /**
-     *  Return the busiest hour in the log file.
+     *  Return the busiest hour(s) in the log file.
+     *  @return A string of busiest hour(s)
      */
-    public int busiestHour()
+    public String busiestHour()
     {
-        int hour = 0;
+        String hour = "";
         if(analyzed) {
             int highest = hourCounts[0];
             for(int i=0; i<hourCounts.length; i++) {
                 if (hourCounts[i] > highest) {
                     highest = hourCounts[i];
-                    hour = i;
+                    hour = "" + i;
+                } else if(hourCounts[i] == highest) {
+                    hour = hour + ", " + i;
                 }
             }
         } else {
@@ -238,24 +256,30 @@ public class LogAnalyzerPro
     }
     
     /**
-     *  Return the busiest two-hour period in the log file.
+     *  Return the busiest two-hour period(s) in the log file.
      *  
-     * @return the first hour of the two-hour period
+     * @return A string of the first hour of the two-hour period(s)
      */
-    public int busiestTwoHour()
+    public String busiestTwoHour()
     {
-       int hour = 0;
+       String hour = "";
        if(analyzed) {
            int highest = hourCounts[0];
+           //Check every two hr range starting at 12am
            for(int i=0; i<hourCounts.length - 1; i++) {
                if((hourCounts[i] + hourCounts[i+1]) > highest) {
                    highest = hourCounts[i] + hourCounts[i+1];
-                   hour = i;
+                   hour = "" + i;
+                } else if((hourCounts[i] + hourCounts[i+1]) == highest) {
+                    hour = hour + ", " + i;
                 }
            }
+           //Check 2hr range 11pm to 1am
            if(hourCounts[23] + hourCounts[0] > highest) {
                highest = hourCounts[23] + hourCounts[0];
-               hour = 23;
+               hour = "23";
+           } else if ((hourCounts[23] + hourCounts[0]) == highest) {
+               hour = hour + ", 23";
            }
        } else {
             System.out.println("Please analyze data first.");
@@ -264,17 +288,20 @@ public class LogAnalyzerPro
     }
     
     /**
-     *  Return the least busy hour in the log file.
+     *  Return the least busy hour(s) in the log file.
+     *  @return A string of least busy hour(s)
      */
-    public int quietestHour()
+    public String quietestHour()
     {
-        int hour = 0;
+        String hour = "";
         if(analyzed) {
             int lowest = hourCounts[0];
             for(int i=0; i<hourCounts.length; i++) {
                 if(hourCounts[i] < lowest) {
                     lowest = hourCounts[i];
-                    hour = i;
+                    hour = "" + i;
+                } else if (hourCounts[i] == lowest) {
+                    hour = hour + ", " + i;
                 }
             }
         } else {
@@ -284,17 +311,20 @@ public class LogAnalyzerPro
     }
     
     /**
-     *  Return the least busy day in the log file.
+     *  Return the least busy day(s) in the log file.
+     *  @@return A string of least busy day(s)
      */
-    public int quietestDay()
+    public String quietestDay()
     {
-        int day = 0;
+        String day = "";
         if(analyzed) {
             int lowest = dayCounts[1];
             for(int i=1; i<dayCounts.length; i++) {
                 if(dayCounts[i] < lowest) {
                     lowest = dayCounts[i];
-                    day = i;
+                    day = "" + i;
+                } else if (dayCounts[i] == lowest) {
+                    day = day + ", " + i;
                 }
             }
         } else {
@@ -304,17 +334,20 @@ public class LogAnalyzerPro
     }
     
     /**
-     *  Return the busiest day in the log file.
+     *  Return the busiest day(s) in the log file.
+     *  @return A string of busiest day(s)
      */
-    public int busiestDay()
+    public String busiestDay()
     {
-        int day = 0;
+        String day = "";
         if(analyzed) {
             int highest = dayCounts[1];
             for(int i=1; i<dayCounts.length; i++) {
                 if(dayCounts[i] > highest) {
                     highest = dayCounts[i];
-                    day = i;
+                    day = "" + i;
+                } else if(dayCounts[i] == highest){
+                    day = day + ", " + i;
                 }
             }
         } else {
@@ -324,17 +357,20 @@ public class LogAnalyzerPro
     }
     
     /**
-     *  Return the least busy month in the log file.
+     *  Return the least busy month(s) in the log file.
+     *  @return A string of least busy month(s)
      */
-    public int quietestMonth() 
+    public String quietestMonth() 
     {
-        int month = 0;
+        String month = "";
         if(analyzed) {
             int lowest = monthCounts[1];
             for(int i=1; i < monthCounts.length; i++) {
                 if(monthCounts[i] < lowest) {
                     lowest = monthCounts[i];
-                    month = i;
+                    month = "" + i;
+                } else if(monthCounts[i] == lowest) {
+                    month = month + ", " + i;
                 }
             }
         } else {
@@ -344,16 +380,19 @@ public class LogAnalyzerPro
     }
     
     /**
-     *  Return the busiest month in the log file.
+     *  Return the busiest month(s) in the log file.
+     *  @return A string of busiest month(s)
      */
-    public int busiestMonth() {
-        int month = 0;
+    public String busiestMonth() {
+        String month = "";
         if(analyzed) {
             int highest = monthCounts[1];
             for(int i=1; i < monthCounts.length; i++) {
                 if(monthCounts[i] > highest) {
                     highest = monthCounts[i];
-                    month = i;
+                    month = "" + i;
+                } else if (monthCounts[i] == highest) {
+                    month = month + ", " + i;
                 }
             }
         } else {
@@ -382,7 +421,8 @@ public class LogAnalyzerPro
         System.out.println("Year: " + year);
         System.out.println("Month : Code: Access Count");
         while(reader2.hasNext()) {
-            if(yr != year) { //If entry isn't the year we want, move to next entry.
+            if(yr != year) { 
+                //If entry isn't the year we want, move to next entry.
                 entry = reader2.next();
                 yr = entry.getYear();
             } else if(month != entry.getMonth()) {
@@ -398,6 +438,7 @@ public class LogAnalyzerPro
                 code404 = 0;
                 code403 = 0;
             } else if (month == entry.getMonth()) {
+                // Increase current month corresponding code counter
                 switch(entry.getCode()) {
                     case 200: code200++;
                                 break;
